@@ -23,13 +23,17 @@ module.exports = {
       chainId: 4,
       blockConfirmations: 6,
       url: RINKEBY_RPC_URL,
-      accounts: [PRIVATE_KEY]
+      accounts: [PRIVATE_KEY],
+      gas: 2100000,
+      gasPrice: 8000000000,
     },
     mumbai: {
       chainId: 80001,
       blockConfirmations: 6,
       url: POLYGON_MUMBAI_RPC_URL,
       accounts: [PRIVATE_KEY],
+      gas: 2100000,
+      gasPrice: 8000000000,
     }
   },
   etherscan: {

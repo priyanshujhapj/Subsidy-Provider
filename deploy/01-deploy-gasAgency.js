@@ -21,9 +21,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         blockConfirmations: network.config.blockConfirmations || 1,
     })
 
-    const GasAgency = await ethers.getContractAt("GasAgency", gasAgency.address, deployer)
-    console.log()
-    await GasAgency.requestForCard("Bob", "0x70997970C51812dc3A010C7d01b50e0d17dc79C8")
-    const requestId = (await GasAgency.requestCounter()).toString()
-    console.log(requestId)
 }

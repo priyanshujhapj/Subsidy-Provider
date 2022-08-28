@@ -20,13 +20,14 @@ contract GasAgency is VRFConsumerBaseV2 {
     uint32 private immutable i_callbackGasLimit;
     uint16 private constant REQUEST_CONFIRMATION = 3;
     uint32 private constant NUM_WORDS = 1;
+    uint256 public requestId;    
 
     // GasStation
     address payable private immutable i_gasStation;
     uint256 public constant DISCOUNT_PERCENTAGE = 20;
 
     // Cards
-    uint256 private currentCardNumber;
+    uint256 public currentCardNumber;
     struct Card {
         uint256 cardNumber;
         address payable user;
@@ -35,7 +36,7 @@ contract GasAgency is VRFConsumerBaseV2 {
     }
     mapping (uint256 => Card) private cards;
     mapping (address => bool) private issuedCardsOnAddresses;
-    mapping (address => uint256) private addressToCardnumber;
+    mapping (address => uint256) public addressToCardnumber;
 
     // Requests
     struct Request {
@@ -87,7 +88,7 @@ contract GasAgency is VRFConsumerBaseV2 {
         requestCounter = 0;
     }
 
-    function approveCards (uint256 _requestId) onlyAgency () public {
+    function approveCards (uint256 _requestId) onlyAgency () public returns (uint256) {
         Request memory request = idToRequests[_requestId];
         if (_checkCardIssued(request.user)) {
             revert GasStation__CardAlreadyIssued();
@@ -97,6 +98,7 @@ contract GasAgency is VRFConsumerBaseV2 {
         issuedCardsOnAddresses[card.user] = true;
         addressToCardnumber[card.user] = card.cardNumber;
         emit NewCardCreated (card.cardNumber, card.user, card.name, card.isValid);
+        return addressToCardnumber[card.user];
     }
 
     function revokeCardValidity (uint256 _cardNumber) onlyAgency () public {
@@ -126,13 +128,14 @@ contract GasAgency is VRFConsumerBaseV2 {
         Request memory request = Request(payable(_user), _name);
         idToRequests[requestCounter] = request;
         // send request for random card number which will be used later during approval
-        uint256 requestId = i_vrfCoordinator.requestRandomWords(
+        uint256 _requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
             REQUEST_CONFIRMATION,
             i_callbackGasLimit,
             NUM_WORDS
         );
+        requestId = _requestId;
     }
 
     function fulfillRandomWords(
@@ -140,6 +143,7 @@ contract GasAgency is VRFConsumerBaseV2 {
         uint256[] memory randomWords
     ) internal override {
         currentCardNumber = randomWords[0];
+        currentCardNumber = currentCardNumber / 10**65;
     }
 
     function payForGas () public payable {

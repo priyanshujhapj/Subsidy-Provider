@@ -6,6 +6,7 @@ require("hardhat-gas-reporter")
 require("hardhat-contract-sizer")
 require("dotenv").config()
 
+const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL || "https://knfndfndk.com"
 const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL || "https://aasdfghjkl.com"
 const POLYGON_MUMBAI_RPC_URL = process.env.POLYGON_MUMBAI_RPC_URL || "https://jnfjenkfjbkwnfkjwen.com"
 const PRIVATE_KEY = process.env.PRIVATE_KEY
@@ -19,10 +20,10 @@ module.exports = {
       chainId: 31337,
       blockConfirmations: 1
     },
-    rinkeby: {
-      chainId: 4,
+    goerli: {
+      chainId: 5,
       blockConfirmations: 6,
-      url: RINKEBY_RPC_URL,
+      url: GOERLI_RPC_URL,
       accounts: [PRIVATE_KEY],
       gas: 2100000,
       gasPrice: 8000000000,
@@ -34,7 +35,15 @@ module.exports = {
       accounts: [PRIVATE_KEY],
       gas: 2100000,
       gasPrice: 8000000000,
-    }
+    },
+    rinkeby: {
+      chainId: 4,
+      blockConfirmations: 6,
+      url: RINKEBY_RPC_URL,
+      accounts: [PRIVATE_KEY],
+      gas: 2100000,
+      gasPrice: 8000000000,
+    },
   },
   etherscan: {
     // yarn hardhat verify --network <NETWORK> <CONTRACT_ADDRESS> <CONSTRUCTOR_PARAMETERS>

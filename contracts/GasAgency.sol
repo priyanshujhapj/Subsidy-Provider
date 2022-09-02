@@ -10,6 +10,7 @@ error GasStation__CardAlreadyIssued();
 error GasStation__CardNotIssuedToAddress();
 error GasStation__NotValidCard();
 error GasStation__InsufficientAmount();
+error GasStation__CurrentCardNumberSetTo0();
 
 contract GasAgency is VRFConsumerBaseV2 {
 
@@ -61,7 +62,7 @@ contract GasAgency is VRFConsumerBaseV2 {
         _;
     }
 
-    modifier onlyValidCardOwners (uint256 _cardNumber) {
+   modifier onlyValidCardOwners (uint256 _cardNumber) {
         if (!issuedCardsOnAddresses[msg.sender]) {
             revert GasStation__CardNotIssuedToAddress();
         }
@@ -93,11 +94,15 @@ contract GasAgency is VRFConsumerBaseV2 {
         if (_checkCardIssued(request.user)) {
             revert GasStation__CardAlreadyIssued();
         }
+        if (currentCardNumber == 0) {
+            revert GasStation__CurrentCardNumberSetTo0();
+        }
         Card memory card = Card(currentCardNumber, request.user, request.name, true);
         cards[card.cardNumber] = card;
         issuedCardsOnAddresses[card.user] = true;
         addressToCardnumber[card.user] = card.cardNumber;
         emit NewCardCreated (card.cardNumber, card.user, card.name, card.isValid);
+        currentCardNumber = 0;
         return addressToCardnumber[card.user];
     }
 
@@ -127,6 +132,9 @@ contract GasAgency is VRFConsumerBaseV2 {
         submittedRequests[_user] = true;
         Request memory request = Request(payable(_user), _name);
         idToRequests[requestCounter] = request;
+    }
+
+    function requestNewUniqueCardNumber () onlyAgency () public {
         // send request for random card number which will be used later during approval
         uint256 _requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
@@ -189,5 +197,10 @@ contract GasAgency is VRFConsumerBaseV2 {
 
     function getMyCardNumber () public view returns (uint256) {
         return addressToCardnumber[msg.sender];
+    }
+
+    function getUserFromRequestId (uint256 _requestId) public view returns (string memory, address) {
+        Request memory requestObj = idToRequests[_requestId];
+        return (requestObj.name, payable(requestObj.user));
     }
 }

@@ -1,8 +1,10 @@
-# Subsidy Provider
+# Subsidy Provider 🏦
+
+*User must have `Goerli` tokens to test the contract*
 
 ## Introduction
 
-This contract represents a Gas Agency backed by government that provides users with a card from which if they pay they get subsidy on their amount, contract owner has the right to issue cards to users.
+This contract represents a Gas Agency backed that provides users with a card, (a 12 digit card, like a debit card) from which they can make payment for their gas, this card is directly linked with their wallet address and amounts are deducted from their balance excluding the subsidy, contract owner has the right to approve the cards to users from the requests that made by the users.
 
 ## Getting Started
 
@@ -21,8 +23,8 @@ yarn install
 
 ## Usage
 
-Compile and deploy contract on `mumbai` testnet
+Compile and deploy contract on `Goerli` testnet
 
 ```
-hh deploy --network mumbai
+hh deploy --network goerli
 ```
